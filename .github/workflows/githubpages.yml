@@ -25,8 +25,9 @@ jobs:
           git checkout ${GITHUB_REF##*/} -- $templates $docs
           mkdir -p static/templates/
           mv templates/* static/templates/
+          mv *.yaml static/templates/
           mkdir -p docs/
-          mv *.md docs/
+          mv docs/*.md docs/
           git add -A
           git diff-index --quiet HEAD ||  git commit -am "deploy files"
           git push origin $TARGET_BRANCH
