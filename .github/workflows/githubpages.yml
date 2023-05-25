@@ -17,7 +17,7 @@ jobs:
           TARGET_BRANCH: "main"
         run: |
           templates=$(find templates/ -type f)
-          docs=$(find docs/ -type f)
+          docs=$(find *.md -type f \( ! -iname "README.md" \))
           git config --global user.name 'GitHub Action'
           git config --global user.email 'action@github.com'
           git fetch
@@ -25,9 +25,8 @@ jobs:
           git checkout ${GITHUB_REF##*/} -- $templates $docs
           mkdir -p static/templates/
           mv templates/* static/templates/
-          mv *.yaml static/templates/
           mkdir -p docs/
-          mv docs/* docs/
+          mv *.md docs/
           git add -A
           git diff-index --quiet HEAD ||  git commit -am "deploy files"
           git push origin $TARGET_BRANCH
