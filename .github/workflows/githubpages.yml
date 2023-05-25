@@ -1,0 +1,32 @@
+name: Deploy guidelines using github-pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  copy-docs:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v3
+      - name: Copy content
+        env:
+          TARGET_BRANCH: "main"
+        run: |
+          templates=$(find templates/ -type f)
+          docs=$(find *.md -type f \( ! -iname "README.md" \))
+          git config --global user.name 'GitHub Action'
+          git config --global user.email 'action@github.com'
+          git fetch
+          git checkout $TARGET_BRANCH
+          git checkout ${GITHUB_REF##*/} -- $templates $docs
+          mkdir -p static/templates/
+          mv templates/* static/templates/
+          mkdir -p docs/
+          mv *.md docs/
+          git add -A
+          git diff-index --quiet HEAD ||  git commit -am "deploy files"
+          git push origin $TARGET_BRANCH
